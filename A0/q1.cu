@@ -1,6 +1,6 @@
 #include<stdio.h>
 
-const int ARRAY_SIZE =500000;
+const int ARRAY_SIZE =500000; // size greater than 32M could not be achieved
 const int ARRAY_BYTES = ARRAY_SIZE * sizeof(float);
 const int MAX_NO_THREADS = 512;
 

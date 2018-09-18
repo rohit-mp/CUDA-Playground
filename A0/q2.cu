@@ -42,11 +42,19 @@ int main(){
     cudaMemcpy(d_in1, h_in1, MATRIX_BYTES, cudaMemcpyHostToDevice);
     cudaMemcpy(d_in2, h_in2, MATRIX_BYTES, cudaMemcpyHostToDevice);
 
+    cudaEvent_t start, stop;
+    cudaEventCreate(&stop);
+    cudaEventCreate(&start);
+
     //starting kernel
+    cudaEventRecord(start);
     matrix_add<<<(int)(MATRIX_WIDTH*MATRIX_WIDTH/MAX_NO_THREADS)+1, MAX_NO_THREADS>>>(d_in1, d_in2, d_out);
+    cudaEventRecord(stop);
 
     //transferring memory from device to host
     cudaMemcpy(h_out, d_out, MATRIX_BYTES, cudaMemcpyDeviceToHost);
+
+    cudaEventSynchronize(stop);
 
     //printing the output
     /*for(i=0;i<MATRIX_WIDTH*MATRIX_WIDTH;i++)
@@ -57,6 +65,10 @@ int main(){
 	printf("the result is correct\n");
     else
 	printf("the result is incorrect\n");
+
+    float time= 0 ;
+    cudaEventElapsedTime(&time, start, stop);
+    printf("time taken in ms: %f\n",time);
 
     //freeing memory
     cudaFree(d_in1);
