@@ -11,13 +11,13 @@ int main(){
     printf("Enter the size of array(less than 50k)\n");
     int array_size;
     scanf("%d",&array_size);
-    printf("the sum of the first %d natural numbers is ",array_size-1);
+    printf("the sum of the first %d natural numbers is ",array_size);
 
     //allocating memory and generating the array
     float *h_in;
     h_in = (float *)malloc(array_size*sizeof(float));
     for(int i=0; i<array_size; i++){
-        h_in[i]=i;
+        h_in[i]=i+1;
     }
 
     //adding zero padding at the end
@@ -31,13 +31,14 @@ int main(){
     int array_bytes = array_size*sizeof(float);
     cudaMalloc((void **)&d_in, array_bytes);
     cudaMemcpy(d_in, h_in, array_size*sizeof(float), cudaMemcpyHostToDevice);
-
+    
+    //implementing performance metrics
+    float time=0;
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
 
     //iteratively calling the kernel and calculating the time
-    float time=0;
     while(array_size>1){
         float *d_out;
         float temptime=0;
@@ -60,7 +61,7 @@ int main(){
     cudaMemcpy(value,d_in, sizeof(float), cudaMemcpyDeviceToHost);
     
     printf("%f\n",*value);
-    printf("time taken : %f\n",time);
+    printf("time spent in gpu in ms : %f\n",time);
 
     return 0;
 }   

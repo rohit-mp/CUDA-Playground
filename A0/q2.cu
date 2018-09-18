@@ -1,8 +1,8 @@
 #include<stdio.h>
 
 const int MATRIX_WIDTH = 400;
-    const int MATRIX_BYTES = MATRIX_WIDTH * MATRIX_WIDTH * sizeof(float);
-    const int MAX_NO_THREADS = 512;
+const int MATRIX_BYTES = MATRIX_WIDTH * MATRIX_WIDTH * sizeof(float);
+const int MAX_NO_THREADS = 512;
 
 __global__ void matrix_add(float *d_in1, float *d_in2, float *d_out){
     int index = threadIdx.x + blockIdx.x*blockDim.x ;
@@ -56,11 +56,6 @@ int main(){
 
     cudaEventSynchronize(stop);
 
-    //printing the output
-    /*for(i=0;i<MATRIX_WIDTH*MATRIX_WIDTH;i++)
-        printf("%f\t",(h_out+i))
-    printf("\n");*/
-
     if(check(h_in1,h_in2,h_out))
 	printf("the result is correct\n");
     else
@@ -68,7 +63,7 @@ int main(){
 
     float time= 0 ;
     cudaEventElapsedTime(&time, start, stop);
-    printf("time taken in ms: %f\n",time);
+    printf("time spent in gpu in ms: %f\n",time);
 
     //freeing memory
     cudaFree(d_in1);
