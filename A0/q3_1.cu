@@ -62,6 +62,6 @@ int main(){
     
     printf("%f\n",*value);
     printf("time spent in gpu in ms : %f\n",time);
-
+    
     return 0;
 }   

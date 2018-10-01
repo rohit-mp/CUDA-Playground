@@ -10,7 +10,6 @@ __global__ void add(float *d_in, float *d_out, int array_size){
 
 }
 
-
 int main(){
     
     //reading array size
