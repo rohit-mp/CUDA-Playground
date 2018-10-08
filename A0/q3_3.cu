@@ -13,8 +13,9 @@ __global__ void array_sum(float *d_in, float *d_sum){
         ctr*=2;
         __syncthreads();
     }
-    //atomicAdd(d_sum, d_in[blockDim.x*blockIdx.x]);
-    *d_sum += d_in[blockDim.x*blockIdx.x];
+    if(threadIdx.x==0)	    
+	atomicAdd(d_sum, d_in[blockDim.x*blockIdx.x]);
+
 }
 
 int main(){
@@ -36,10 +37,6 @@ int main(){
         h_in[i]=0;
     }
 
-    for(i=0;i<array_size;i++){
-        printf("%f, ",h_in[i]);
-    }
-    printf("\n");
 
     //copying data to device
     float *d_in;
@@ -67,8 +64,7 @@ int main(){
 
     //copying answer from device to host
     float h_sum[1];
-    cudaMemcpy(h_sum, d_in, sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy(h_in, d_in, array_size, cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_sum, d_sum, sizeof(float), cudaMemcpyDeviceToHost);
     
     printf("sum of first %d natural numbers is %f\n",n ,h_sum[0]);
     printf("time spent in the gpu : %f\n",time);
