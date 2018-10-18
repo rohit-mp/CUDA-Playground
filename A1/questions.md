@@ -4,11 +4,11 @@ Copy host memory to device
 Invoke thrust::transform()
 Copy results from device to host
 
-Links for reference:
-http://developer.nvidia.com/technologies/libraries 
-http://docs.nvidia.com/cuda/thrust/index.html
-http://www.mariomulansky.de/data/uploads/cuda_thrust.pdf 
-https://www.bu.edu/pasi/files/2011/07/Lecture6.pdf 
+Links for reference:  
+http://developer.nvidia.com/technologies/libraries   
+http://docs.nvidia.com/cuda/thrust/index.html  
+http://www.mariomulansky.de/data/uploads/cuda_thrust.pdf   
+https://www.bu.edu/pasi/files/2011/07/Lecture6.pdf   
 
 Instructions about where to place each part of the code is demarcated by the //@@ comment lines. The executable generated as a result of compiling the lab can be run using the following command:
 ./ThrustVectorAdd_Template <expected.raw> <input0.raw> <input1.raw> <output.raw>
