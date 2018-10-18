@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 	//@@ Insert Code here
 	thrust::host_vector<float> h_in1(hostInput1, hostInput1+inputLength);
 	thrust::host_vector<float> h_in2(hostInput2, hostInput2+inputLength);
-	thrust::device_vector<float> d_in1=h_in1, d_in2=h_in2, d_out;
+	thrust::device_vector<float> d_in1=h_in1, d_in2=h_in2, d_out(inputLength);
 
 	// Execute vector addition
 	//@@ Insert Code here
