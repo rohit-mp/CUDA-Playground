@@ -1,24 +1,37 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-#define CEIL(a, b) ((a-1)/b +1)
-
+const int TILE_DIM = 32;
 const int MAX_DIM = 100;
 const int MAX_SIZE = MAX_DIM*MAX_DIM;
-const int MAX_BYTES = MAX_SIZE*sizeof(float);
+const int MAX_BYTES = MAX_SIZE * sizeof(float);
+#define CEIL(a,b) ((a-1)/b + 1)
 
 __global__ void matrix_mul(float *d_m1, float *d_m2, float *d_m3){
-    int idx = blockIdx.x*blockDim.x + threadIdx.x;
-    if(idx >= MAX_SIZE)
-        return;
-    float tempsum=0;
-    int i = idx/MAX_DIM;
-    int j = idx%MAX_DIM;
-    for(int k=0;k<MAX_DIM;k++){
-        tempsum += d_m1[i*MAX_DIM + k]*d_m2[j + k*MAX_DIM];
+    __shared__ float a[TILE_DIM][TILE_DIM], b[TILE_DIM][TILE_DIM];
+
+    int x = blockDim.x*blockIdx.x + threadIdx.x;
+    int y = blockDim.y*blockIdx.y + threadIdx.y;
+    int temp=0;
+
+    for(int k=0; k<CEIL(MAX_DIM,TILE_DIM); k++){
+        if(x<MAX_DIM && k*TILE_DIM + threadIdx.y<MAX_DIM)
+            a[threadIdx.x][threadIdx.y] = d_m1[x*MAX_DIM + k*TILE_DIM + threadIdx.y];
+        else
+            a[threadIdx.x][threadIdx.y] = 0;
+        if(k*TILE_DIM + threadIdx.x<MAX_DIM && y<MAX_DIM)
+            b[threadIdx.x][threadIdx.y] = d_m2[k*TILE_DIM*MAX_DIM + threadIdx.x*MAX_DIM + y];
+        else
+            b[threadIdx.x][threadIdx.y]=0;
+        __syncthreads();
+
+        for(int q=0; q<TILE_DIM;q++)
+            temp+=a[threadIdx.x][q]*b[q][threadIdx.y];
+        __syncthreads();
     }
-    d_m3[idx] = tempsum;
-}   
+    if(x<MAX_DIM && y<MAX_DIM)
+        d_m3[x*MAX_DIM+y] = temp;
+}
 
 int main(){
 printf("starting program execution\n");fflush(stdin);
@@ -42,9 +55,9 @@ printf("device memory allocated\n");fflush(stdin);
     //copying data from host to device
     cudaMemcpy(d_m1, h_m1, MAX_BYTES, cudaMemcpyHostToDevice);
     cudaMemcpy(d_m2, h_m2, MAX_BYTES, cudaMemcpyHostToDevice);
-printf("starting kernel call\n");fflush(stdin);
+    printf("starting kernel call\n");fflush(stdin);
     //calling kernel
-    matrix_mul<<< CEIL(MAX_SIZE, 1024), 1024 >>>(d_m1, d_m2, d_m3);
+    matrix_mul<<< dim3(CEIL(MAX_DIM,32), CEIL(MAX_DIM,32), 1), dim3(32,32,1) >>>(d_m1, d_m2, d_m3);
 printf("kernel call complete\n");fflush(stdin);
     //transferring result from device to host
     cudaMemcpy(h_m3, d_m3, MAX_BYTES, cudaMemcpyDeviceToHost);
@@ -69,4 +82,5 @@ printf("kernel call complete\n");fflush(stdin);
     }
     if(flag==1)
         printf("The solution is correct\n");
+    return 0;
 }
