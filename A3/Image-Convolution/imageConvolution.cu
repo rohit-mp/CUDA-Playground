@@ -20,7 +20,7 @@ using namespace std;
 
 const int num_channels = 3;
 
-__global__ void convolve(float *deviceInputImageData, float *deviceMaskData, float *deviceOutputImageData, int width, int height){
+__global__ void convolve(float *deviceInputImageData, float* __restrict__ deviceMaskData, float *deviceOutputImageData, int width, int height){
 
 	int idx = blockDim.x*blockIdx.x + threadIdx.x;
 	if(idx>=0 && idx<width*height){
