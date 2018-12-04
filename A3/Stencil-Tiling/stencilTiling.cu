@@ -28,27 +28,25 @@ __global__ void compute(float *deviceInputData, float *deviceOutputData, int wid
 
     __shared__ float shared_mem[ 34*34 ];
 
-    if(i>=0 && i<height && j>=0 && j<width && k>=0 && k<depth){
-        if(i>=1 && i<height-1 && j>0 && j<width-1 && k>0 && k<depth-1){
-            int a,b,c;
-            for(a=-1; i<=1; a++){
-                for(b=-1; b<=1; b++){
-                    for(c=-1; c<=1; c++){
-                        shared_mem[((i+a)*width + (j+b)) * depth + (k+c)] = deviceInputData[((i+a)*width + (j+b)) * depth + (k+c)];
-                    }
+    float val = 0.1;
+    if(i>=1 && i<height-1 && j>0 && j<width-1 && k>0 && k<depth-1){
+        int a,b,c;
+        for(a=-1; a<=1; a++){
+            for(b=-1; b<=1; b++){
+                for(c=-1; c<=1; c++){
+                    shared_mem[((i+a)*width + (j+b)) * depth + (k+c)] = deviceInputData[((i+a)*width + (j+b)) * depth + (k+c)];
                 }
-            }    
-        }
+            }
+        }    
         __syncthreads();
-
-        int val = shared_mem[((i)*width + (j)) * depth + (k)];
-        if(i>=1 && i<height-1 && j>0 && j<width-1 && k>0 && k<depth-1){
-            val = shared_mem[((i-1)*width + (j)) * depth + (k)] + shared_mem[((i)*width + (j-1)) * depth + (k)] + shared_mem[((i)*width + (j)) * depth + (k-1)]
-                + shared_mem[((i+1)*width + (j)) * depth + (k)] + shared_mem[((i)*width + (j+1)) * depth + (k)] + shared_mem[((i)*width + (j)) * depth + (k+1)]
-                - 6*val;
-        }
-        deviceOutputData[((i)*width + (j)) * depth + (k)] = val;
+        val = shared_mem[((i-1)*width + (j)) * depth + (k)] + shared_mem[((i)*width + (j-1)) * depth + (k)] + shared_mem[((i)*width + (j)) * depth + (k-1)]
+            + shared_mem[((i+1)*width + (j)) * depth + (k)] + shared_mem[((i)*width + (j+1)) * depth + (k)] + shared_mem[((i)*width + (j)) * depth + (k+1)]
+            - 6*shared_mem[((i)*width + (j)) * depth + (k)];
+        val=0.1;
+        deviceOutputData[((i)*width + (j)) * depth + (k)] = Clamp(val, 0.0, 1.0);
     }
+    val=0.15;
+    deviceOutputData[((i)*width + (j)) * depth + (k)] = Clamp(val, 0.0, 1.0);
 }
 
 
