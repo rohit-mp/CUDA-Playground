@@ -32,7 +32,6 @@ __global__ void compute(float *deviceInputData, float *deviceOutputData, int wid
             + deviceInputData[((i)*width + (j+1)) * depth + (k)] + deviceInputData[((i)*width + (j)) * depth + (k+1)]
             - 6*deviceInputData[((i)*width + (j)) * depth + (k)];
         deviceOutputData[((i)*width + (j)) * depth + (k)] = Clamp(val, 0.0, 1.0);
-        if(i==1021) deviceOutputData[((i)*width + (j)) * depth + (k)] = 0.15;
     }
 }
 
