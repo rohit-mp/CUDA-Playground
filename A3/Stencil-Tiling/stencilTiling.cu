@@ -22,11 +22,11 @@ using namespace std;
 __global__ void compute(float *deviceInputData, float *deviceOutputData, int width, int height, int depth){
     int x = blockDim.x*blockIdx.x + threadIdx.x;
     int y = blockDim.y*blockIdx.y + threadIdx.y;
-    int i = x/depth;
+    int j = x/depth;
     int k = x%depth;
-    int j = y;
-    
-    if(j>0 && j<height-1 && i>0 && i<width-1 && k>0 && k<depth-1){
+    int i = y;
+
+    if(j>0 && j<width-1 && i>0 && i<height-1 && k>0 && k<depth-1){
         float val = deviceInputData[((i-1)*width + (j)) * depth + (k)] + deviceInputData[((i)*width + (j-1)) * depth + (k)] 
             + deviceInputData[((i)*width + (j)) * depth + (k-1)] + deviceInputData[((i+1)*width + (j)) * depth + (k)] 
             + deviceInputData[((i)*width + (j+1)) * depth + (k)] + deviceInputData[((i)*width + (j)) * depth + (k+1)]
