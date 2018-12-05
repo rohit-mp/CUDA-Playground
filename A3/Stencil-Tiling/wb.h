@@ -1093,11 +1093,11 @@ void wbSolution(const wbArg_t& args, const wbImage_t& image)
         const float tolerance = 1.5f;
         int errCnt = 0;
 
-        for (int i = 0; i < image.width; ++i)
+        for (int i = 1; i < image.width-1; ++i)
         {
-            for (int j = 0; j < image.height; ++j)
+            for (int j = 1; j < image.height-1; ++j)
             {
-                for (int k = 0; k < image.channels; ++k)
+                for (int k = 1; k < image.channels-1; ++k)
                 {
                     const int index = (j * image.width + i) * image.channels + k;
                     const float error = fabs(solnImage.data[index] - image.data[index]);
