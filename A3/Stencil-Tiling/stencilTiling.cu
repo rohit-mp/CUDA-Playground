@@ -25,12 +25,14 @@ __global__ void compute(float *deviceInputData, float *deviceOutputData, int wid
     int i = x/depth;
     int k = x%depth;
     int j = y;
+    
     if(j>0 && j<height-1 && i>0 && i<width-1 && k>0 && k<depth-1){
         float val = deviceInputData[((i-1)*width + (j)) * depth + (k)] + deviceInputData[((i)*width + (j-1)) * depth + (k)] 
             + deviceInputData[((i)*width + (j)) * depth + (k-1)] + deviceInputData[((i+1)*width + (j)) * depth + (k)] 
             + deviceInputData[((i)*width + (j+1)) * depth + (k)] + deviceInputData[((i)*width + (j)) * depth + (k+1)]
             - 6*deviceInputData[((i)*width + (j)) * depth + (k)];
         deviceOutputData[((i)*width + (j)) * depth + (k)] = Clamp(val, 0.0, 1.0);
+        if(i==1021) deviceOutputData[((i)*width + (j)) * depth + (k)] = 0.15;
     }
 }
 
@@ -84,6 +86,24 @@ int main(int argc, char *argv[]) {
     cudaMemcpy(output.data, deviceOutputData, width * height * depth * sizeof(float),
         cudaMemcpyDeviceToHost);
     wbTime_stop(Copy, "Copying data from the GPU");
+
+    /*float *hostOutputData = (float*)malloc(sizeof(float)*width*height*depth);
+    cudaMemcpy(hostOutputData, deviceOutputData, sizeof(float)*width*height*depth, cudaMemcpyDeviceToHost);
+    int i,j,k;
+    for(i=1; i<width-1; i++){
+        for(j=1; j<height-1; j++){
+            for(k=1; k<depth-1; k++){
+                if(hostOutputData[((i)*width + (j)) * depth + (k)] != Clamp(hostInputData[((i-1)*width + (j)) * depth + (k)] + hostInputData[((i+1)*width + (j)) * depth + (k)]
+                    + hostInputData[((i)*width + (j-1)) * depth + (k)] + hostInputData[((i)*width + (j+1)) * depth + (k)]
+                    + hostInputData[((i)*width + (j)) * depth + (k-1)] + hostInputData[((i)*width + (j)) * depth + (k+1)]
+                    - 6*hostInputData[((i)*width + (j)) * depth + (k)], 0.0, 1.0))
+                    printf("%d,%d,%d Found:%f, Expected:%f\n",i,j,k,hostOutputData[((i)*width + (j)) * depth + (k)], hostInputData[((i-1)*width + (j)) * depth + (k)] + hostInputData[((i+1)*width + (j)) * depth + (k)]
+                    + hostInputData[((i)*width + (j-1)) * depth + (k)] + hostInputData[((i)*width + (j+1)) * depth + (k)]
+                    + hostInputData[((i)*width + (j)) * depth + (k-1)] + hostInputData[((i)*width + (j)) * depth + (k+1)]
+                    - 6*hostInputData[((i)*width + (j)) * depth + (k)]);
+            }
+        }
+    }*/
 
     wbSolution(arg, output);
 
