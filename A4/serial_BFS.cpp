@@ -16,6 +16,7 @@ int main(int argc, char *argv[]){
     input >> nodes;
     input >> edges;
 
+    //initializing depths of all nodes
     int i;
     int *d = (int*)calloc(nodes, sizeof(int));
     d[0]=0;
@@ -23,26 +24,45 @@ int main(int argc, char *argv[]){
         d[i] = MAX_VAL;
     }
     
+    //generating an array of cumulative number of edges from vertices
     int cum_no[nodes];
     input >> i; //ignore 0
     for(i=0; i<nodes; i++){
         input >> cum_no[i];
     }
 
-    int n=0;
-    int temp;
+    //generating the graph in vector form
+    vector<int> adj = new vector<int>[nodes];
+    int n=0, i;
     for(i=0; i<edges*2; i++){
+        int temp;
         input >> temp;
-        if(d[temp] > d[n]+1)
-            d[temp] = d[n]+1;
-        if(i+1 == cum_no[n])
+        adj[n].push_back(temp);
+        if(i+1==cum_no[n])
             n++;
     }
 
+    //performing BFS
     int depth = 0;
-    for(i=0; i<nodes; i++){
-        if(d[i] > depth)
-            depth = d[i];
+    int visited[nodes];
+    visited[0]=1;
+    for(i=1;i<nodes; i++){
+        visited[i]=0;
+    }
+    queue<int> q;
+    q.push(0);
+    while(!q.empty()){
+        int cur = q.pop();
+        for(i=0; i<adj[cur].size(); i++){
+            if( !visited[adj[cur][i]] ){
+                d[adj[cur][i]] = d[cur] + 1;
+                visited[adj[cur][i]] = 1;
+                q.push(adj[cur][i]);
+                if(depth < d[adj[cur][i]]){
+                    depth = d[adj[cur][i]];
+                }
+            }
+        }
     }
 
     cout << "Depth of the tree is " << depth << endl;
