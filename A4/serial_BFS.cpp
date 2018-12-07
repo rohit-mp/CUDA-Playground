@@ -41,13 +41,13 @@ int main(int argc, char *argv[]){
         while(i+1==cum_no[n])
             n++;
     }
-    for(n=0; n<nodes; n++){
+    /*for(n=0; n<nodes; n++){
         printf("%d -> ",n);
         for(i=0; i<adj[n].size(); i++){
             printf("%d, ",adj[n][i]);
         }
         printf("\n");
-    }
+    }*/
 
     //performing BFS
     int depth = 0;
@@ -60,14 +60,14 @@ int main(int argc, char *argv[]){
     q.push(0);
     while(!q.empty()){
         int cur = q.front();
-        printf("Popping %d\n",cur);
+        //printf("Popping %d\n",cur);
         q.pop();
         for(i=0; i<adj[cur].size(); i++){
             if( !visited[adj[cur][i]] ){
                 d[adj[cur][i]] = d[cur] + 1;
                 visited[adj[cur][i]] = 1;
                 q.push(adj[cur][i]);
-                printf("Pushing %d\n",adj[cur][i]);
+                //printf("Pushing %d\n",adj[cur][i]);
                 if(depth < d[adj[cur][i]]){
                     depth = d[adj[cur][i]];
                 }
