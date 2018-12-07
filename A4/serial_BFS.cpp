@@ -25,14 +25,14 @@ int main(int argc, char *argv[]){
     }
     
     //generating an array of cumulative number of edges from vertices
-    int cum_no[nodes];
+    int *cum_no = (int*)calloc(nodes,sizeof(int));
     input >> i; //ignore 0
     for(i=0; i<nodes; i++){
         input >> cum_no[i];
     }
-
+    printf("generated cum_no array\n");
     //generating the graph in vector form
-    vector<int> adj[nodes];
+	vector<vector<int> > adj(nodes, vector<int>());
     int n=0;
     for(i=0; i<edges*2; i++){
         int temp;
@@ -41,6 +41,7 @@ int main(int argc, char *argv[]){
         while(i+1==cum_no[n])
             n++;
     }
+    printf("Generated adj\n");
     /*for(n=0; n<nodes; n++){
         printf("%d -> ",n);
         for(i=0; i<adj[n].size(); i++){
@@ -51,11 +52,9 @@ int main(int argc, char *argv[]){
 
     //performing BFS
     int depth = 0;
-    int visited[nodes];
+    int *visited = (int*)calloc(nodes, sizeof(int));
     visited[0]=1;
-    for(i=1;i<nodes; i++){
-        visited[i]=0;
-    }
+    
     queue<int> q;
     q.push(0);
     while(!q.empty()){
