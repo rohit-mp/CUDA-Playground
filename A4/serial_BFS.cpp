@@ -27,8 +27,7 @@ int main(int argc, char *argv[]){
     //generating an array of cumulative number of edges from vertices
     int *cum_no = (int*)calloc(nodes,sizeof(int));
     input >> i; //ignore 0
-    for(i=0; i<nod
-    es; i++){
+    for(i=0; i<nodes; i++){
         input >> cum_no[i];
     }
     printf("generated cum_no array\n");
