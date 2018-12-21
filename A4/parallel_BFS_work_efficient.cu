@@ -2,6 +2,20 @@
 using namespace std;
 
 #define MAX_VAL 1e9
+#define cudaCatchError(error) { gpuAssert((error), __FILE__, __LINE__); }
+
+// Catch Cuda errors
+inline void gpuAssert(cudaError_t error, const char *file, int line,  bool abort = false)
+{
+    if (error != cudaSuccess)
+    {
+        printf("\n====== Cuda Error Code %i ======\n %s in CUDA %s\n", error, cudaGetErrorString(error));
+        printf("\nIn file :%s\nOn line: %d", file, line);
+        
+        if(abort)
+            exit(-1);
+    }
+}
 
 __global__ void compute(int *d_r, int *d_c, int *d_depth, int *max_depth, int *Q1, int *Q2, int nodes){
     int idx = threadIdx.x;
@@ -94,7 +108,7 @@ int main(int argc, char *argv[]){
 
     int *result = (int *)malloc(sizeof(int));
     printf("done\n");
-    cudaMemcpy(result, max_depth, sizeof(int), cudaMemcpyDeviceToHost);
+    cudaCatchError(cudaMemcpy(result, max_depth, sizeof(int), cudaMemcpyDeviceToHost));
 
     printf("Depth : %d\n", result[0]);
 
