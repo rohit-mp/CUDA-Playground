@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-#define MAX_VAL 1e9
+#define MAX_VAL ((int)1e8)
 #define cudaCatchError(error) { gpuAssert((error), __FILE__, __LINE__); }
 
 // Catch Cuda errors
@@ -34,23 +34,16 @@ __global__ void compute(int *d_r, int *d_c, int *d_depth, int *max_depth, int *Q
     }
     __syncthreads();
 
-    do{
-        /*if(idx<len1){
-            for(int j=d_r[Q1[idx]]; j<d_r[Q1[idx]+1]; j++){
-                d_depth[d_c[j]] = curr_depth+1;
-                Q2[len2++] = d_c[j];
-            }
-        }*/
-        for(i=idx; i<nodes; i+=1024){
-            if(i<len1){
-                for(int j=d_r[Q1[i]]; j<d_r[Q1[i]+1]; j++){
-                    if(atomicCAS(&d_depth[j], MAX_VAL, d_depth[i]+1) == MAX_VAL){
-                        int t = atomicAdd(&len2,1);
-                        Q2[t] = j;  
-                    }
+    while(len1){
+        //__syncthreads();
+        for(i=idx; i<len1; i+=1024){
+            for(int j=d_r[Q1[i]]; j<d_r[Q1[i]+1]; j++){
+                int v = d_c[j];
+                if(atomicCAS(&d_depth[v], MAX_VAL, d_depth[Q1[i]]+1) == MAX_VAL){
+                    int t = atomicAdd(&len2,1);
+                    Q2[t] = v;  
                 }
             }
-            else break;
         }
         __syncthreads();
 
@@ -63,9 +56,12 @@ __global__ void compute(int *d_r, int *d_c, int *d_depth, int *max_depth, int *Q
             curr_depth++;
         }
         __syncthreads();
-    }while(len1);
+    }
 
-    max_depth[0] = curr_depth-1;
+    // if(idx == 0) {
+    //     printf("Hi\n");
+    // }
+    max_depth[0] = curr_depth;
 }
 
 int main(int argc, char *argv[]){
@@ -104,10 +100,10 @@ int main(int argc, char *argv[]){
 
     printf("Starting Computation\n");
     compute <<<1, 1024>>> (d_r, d_c, d_depth, max_depth, Q1, Q2, nodes);
+    cudaThreadSynchronize();
     printf("Finished Computation\n");
 
     int *result = (int *)malloc(sizeof(int));
-    printf("done\n");
     cudaCatchError(cudaMemcpy(result, max_depth, sizeof(int), cudaMemcpyDeviceToHost));
 
     printf("Depth : %d\n", result[0]);
@@ -117,8 +113,9 @@ int main(int argc, char *argv[]){
 	cudaMemcpy(h_depth, d_depth, nodes*sizeof(int), cudaMemcpyDeviceToHost);
 	int *h_check_depth = (int*)malloc(nodes*sizeof(int));
 	freopen(argv[2], "r", stdin);
-
-	for(int i = 0; i < nodes; i++) {
+    printf("malloc done\n");
+    
+    for(int i = 0; i < nodes; i++) {
 		cin>>h_check_depth[i];
     }
     printf("Finished reading output file\n");
