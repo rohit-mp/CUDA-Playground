@@ -10,6 +10,7 @@ Each folder contains a ```README.md``` file containing details and instructions 
 - Sum of elements in an array (normal and thrust implementation)
 - Histogram of ASCII character string
 - Histogarm of integer array
+- Histogram Sort (thrust implementation)
 - Gaussian Image Blur
 - Image Convolution
 - 7 point Stencil
