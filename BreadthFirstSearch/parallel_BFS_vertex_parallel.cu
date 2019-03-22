@@ -82,10 +82,25 @@ int main(int argc, char *argv[]){
     cudaMemcpy(d_r, h_r, (nodes+1)*sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_c, h_c, edges*2*sizeof(int), cudaMemcpyHostToDevice);
  
+    // timer
+    cudaEvent_t start, stop;
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+
+    cudaEventRecord(start);
+
     // kernel call
     printf("Starting Computation\n");
     compute<<< 1,1024 >>> (d_r, d_c, d_depth, max_depth, nodes, edges);
     printf("Finished computation\n");
+
+    // timer
+    cudaEventRecord(stop);
+	cudaEventSynchronize(stop);
+	float milliseconds = 0;
+	cudaEventElapsedTime(&milliseconds, start, stop);
+
+    cout<<"Compute time in GPU: "<<milliseconds<<"ms"<<endl;
     
     // copying results to host
     int *result = (int *)malloc(sizeof(int));

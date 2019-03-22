@@ -1,4 +1,18 @@
 # Intoduction-to-Parallel-Programming-with-CUDA
-This repository will contain my codes related to introduction to parallel programming with CUDA.
 
-The questions for each assignment are in the 'questions.md' file of the respective assignment folder.
+This repository contains implementation of parallel version of various algorithms using ```CUDA```
+
+Each folder contains a ```README.md``` file containing details and instructions to run the codes.
+
+### List of algorithms implemented
+
+- Sum of two arrays (normal and thrust implementation)
+- Sum of elements in an array (normal and thrust implementation)
+- Histogram of ASCII character string
+- Histogarm of integer array
+- Gaussian Image Blur
+- Image Convolution
+- 7 point Stencil
+- Breadth First Search
+- Graph Colouring
+
