@@ -35,7 +35,6 @@ __global__ void compute(int *d_r, int *d_c, int *d_depth, int *max_depth, int *Q
     __syncthreads();
 
     while(len1){
-        //__syncthreads();
         for(i=idx; i<len1; i+=1024){
             for(int j=d_r[Q1[i]]; j<d_r[Q1[i]+1]; j++){
                 int v = d_c[j];
@@ -58,9 +57,6 @@ __global__ void compute(int *d_r, int *d_c, int *d_depth, int *max_depth, int *Q
         __syncthreads();
     }
 
-    // if(idx == 0) {
-    //     printf("Hi\n");
-    // }
     max_depth[0] = curr_depth;
 }
 
@@ -77,9 +73,11 @@ int main(int argc, char *argv[]){
     input >> nodes;
     input >> edges;
 
+    // allocating host memory
     int *h_r = (int*)malloc((nodes+1)*sizeof(int));
     int *h_c = (int*)malloc(edges*2*sizeof(int));
 
+    // reading inputs
     for(i=0; i<nodes+1; i++){
         input >> h_r[i];
     }
@@ -87,6 +85,7 @@ int main(int argc, char *argv[]){
         input >> h_c[i];
     }
     
+    // allocating device memory
     int *Q1, *Q2, *d_r, *d_c, *d_depth, *max_depth;
     cudaMalloc((void**)&Q1, nodes*sizeof(int));
     cudaMalloc((void**)&Q2, nodes*sizeof(int));
@@ -95,20 +94,23 @@ int main(int argc, char *argv[]){
     cudaMalloc((void**)&d_depth, nodes*sizeof(int));
     cudaMalloc((void**)&max_depth, sizeof(int));
 
+    // copying data to device
     cudaMemcpy(d_r, h_r, (nodes+1)*sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_c, h_c, edges*2*sizeof(int), cudaMemcpyHostToDevice);
 
+    // kernel call
     printf("Starting Computation\n");
     compute <<<1, 1024>>> (d_r, d_c, d_depth, max_depth, Q1, Q2, nodes);
     cudaThreadSynchronize();
     printf("Finished Computation\n");
 
+    // copying results to host
     int *result = (int *)malloc(sizeof(int));
     cudaCatchError(cudaMemcpy(result, max_depth, sizeof(int), cudaMemcpyDeviceToHost));
 
     printf("Depth : %d\n", result[0]);
 
-    
+    // solution check
     int *h_depth = (int*) malloc(nodes*sizeof(int));
 	cudaMemcpy(h_depth, d_depth, nodes*sizeof(int), cudaMemcpyDeviceToHost);
 	int *h_check_depth = (int*)malloc(nodes*sizeof(int));

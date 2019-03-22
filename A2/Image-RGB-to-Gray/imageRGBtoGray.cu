@@ -22,15 +22,14 @@ int main(int argc, char *argv[]) {
 	float *deviceInputImageData;
 	float *deviceOutputImageData;
 
-	/* parse the input arguments */
-	wbArg_t args = {argc, argv};	//HERE
+	wbArg_t args = {argc, argv};
 
 	inputImageFile = wbArg_getInputFile(args, 0);
 	inputImage = wbImport(inputImageFile);
 
 	imageWidth  = wbImage_getWidth(inputImage);
 	imageHeight = wbImage_getHeight(inputImage);
-	imageChannels = wbImage_getChannels(inputImage); // For this lab the value is always 3
+	imageChannels = wbImage_getChannels(inputImage);
 
 	// Since the image is monochromatic, it only contains one channel
 	outputImage = wbImage_new(imageWidth, imageHeight, 1);
@@ -52,15 +51,12 @@ int main(int argc, char *argv[]) {
 		imageWidth * imageHeight * imageChannels * sizeof(float), cudaMemcpyHostToDevice);
 	wbTime_stop(Copy, "Copying data to the GPU");
 
-	///////////////////////////////////////////////////////
 	wbTime_start(Compute, "Doing the computation on the GPU");
 
-	//@@ Insert code here
 	RGB_to_gray<<< CEIL(imageWidth*imageHeight, 1024), 1024 >>>(deviceInputImageData, deviceOutputImageData); 
 
 	wbTime_stop(Compute, "Doing the computation on the GPU");
 
-	///////////////////////////////////////////////////////
 	wbTime_start(Copy, "Copying data from the GPU");
 	cudaMemcpy(hostOutputImageData, deviceOutputImageData,
 		imageWidth * imageHeight * sizeof(float), cudaMemcpyDeviceToHost);

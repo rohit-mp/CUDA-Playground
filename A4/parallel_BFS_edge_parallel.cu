@@ -59,10 +59,12 @@ int main(int argc, char *argv[]){
     input >> nodes;
     input >> edges;
 
+    // allocating host memory
     int *h_r = (int*)malloc((nodes+1)*sizeof(int));
     int *h_u = (int*)malloc(edges*2*sizeof(int));
     int *h_v = (int*)malloc(edges*2*sizeof(int));
 
+    // reading the inputs
     for(i=0; i<nodes+1; i++){
         input >> h_r[i];
     }
@@ -75,6 +77,7 @@ int main(int argc, char *argv[]){
         input >> h_v[i];
     }
 
+    // allocating device memory
     int *d_r, *d_u, *d_v, *d_depth, *max_depth;
     cudaMalloc((void**)&d_r, (nodes+1)*sizeof(int));
     cudaMalloc((void**)&d_u, edges*2*sizeof(int));
@@ -82,20 +85,23 @@ int main(int argc, char *argv[]){
     cudaMalloc((void**)&d_depth, nodes*sizeof(int));
     cudaMalloc((void**)&max_depth, sizeof(int));
 
+    // copying data to device
     cudaMemcpy(d_r, h_r, (nodes+1)*sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_u, h_u, edges*2*sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_v, h_v, edges*2*sizeof(int), cudaMemcpyHostToDevice);
 
+    // kernel call
     printf("Starting Computation\n");
     compute<<< 1,1024 >>> (d_r, d_u, d_v, d_depth, max_depth, nodes, edges);
     printf("Finished computation\n");
     
+    // copying the results to host
     int *result = (int *)malloc(sizeof(int));
     cudaMemcpy(result, max_depth, sizeof(int), cudaMemcpyDeviceToHost);
 
     printf("Depth : %d\n", result[0]);
 
-    
+    // solution check
     int *h_depth = (int*) malloc(nodes*sizeof(int));
 	cudaMemcpy(h_depth, d_depth, nodes*sizeof(int), cudaMemcpyDeviceToHost);
 	int *h_check_depth = (int*)malloc(nodes*sizeof(int));

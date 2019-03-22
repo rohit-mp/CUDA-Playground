@@ -6,7 +6,6 @@ using namespace std;
 #define CHANNELS 3
 #define CEIL(a, b) ((a-1)/b +1)
 
-//@@ INSERT CODE HERE
 __global__ void compute(float *deviceInputImageData, float *deviceOutputImageData, const int height, const int width){
 	int xidx = blockDim.x*blockIdx.x + threadIdx.x;
 	int yidx = blockDim.y*blockIdx.y + threadIdx.y;
@@ -39,7 +38,6 @@ int main(int argc, char *argv[]) {
 	float *deviceOutputImageData;
 
 
-	/* parse the input arguments */
 	wbArg_t args = wbArg_read(argc, argv);
 	inputImageFile = wbArg_getInputFile(args, 0);
 
@@ -70,8 +68,8 @@ int main(int argc, char *argv[]) {
 	wbTime_start(Compute, "Doing the computation on the GPU");
 
 	// Kernel call
-	//@@ Insert Code here
-	compute<<< dim3((int)CEIL(imageWidth, 32), (int)CEIL(imageHeight, 32), 1), dim3(32, 32, 1) >>>(deviceInputImageData, deviceOutputImageData, imageHeight, imageWidth);
+	compute<<< dim3((int)CEIL(imageWidth, 32), (int)CEIL(imageHeight, 32), 1), dim3(32, 32, 1) >>>(deviceInputImageData,
+		 deviceOutputImageData, imageHeight, imageWidth);
 
 	wbTime_stop(Compute, "Doing the computation on the GPU");
 

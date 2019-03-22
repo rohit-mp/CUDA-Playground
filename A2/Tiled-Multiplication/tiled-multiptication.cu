@@ -34,31 +34,31 @@ __global__ void matrix_mul(float *d_m1, float *d_m2, float *d_m3){
 }
 
 int main(){
-printf("starting program execution\n");fflush(stdin);
+
     //allocating memory for host arrays
     float h_m1[MAX_SIZE], h_m2[MAX_SIZE], h_m3[MAX_SIZE];
-printf("host arrays declared\n");fflush(stdin);
+
     //generating input arrays
     for(int i=0;i<MAX_SIZE;i++)
         h_m1[i] = (float)(rand()%100);
     for(int i=0;i<MAX_SIZE;i++)
         h_m2[i] = (float)(rand()%100);
-printf("host arrays generated\n");fflush(stdin);   
-    //declaring device memory pointers
+
+        //declaring device memory pointers
     float *d_m1, *d_m2, *d_m3;
-printf("device pointers declared\n");fflush(stdin);
+
     //allocating device memory
     cudaMalloc((void **)&d_m1, MAX_BYTES);
     cudaMalloc((void **)&d_m2, MAX_BYTES);
     cudaMalloc((void **)&d_m3, MAX_BYTES);
-printf("device memory allocated\n");fflush(stdin);
+
     //copying data from host to device
     cudaMemcpy(d_m1, h_m1, MAX_BYTES, cudaMemcpyHostToDevice);
     cudaMemcpy(d_m2, h_m2, MAX_BYTES, cudaMemcpyHostToDevice);
-    printf("starting kernel call\n");fflush(stdin);
+
     //calling kernel
     matrix_mul<<< dim3(CEIL(MAX_DIM,32), CEIL(MAX_DIM,32), 1), dim3(32,32,1) >>>(d_m1, d_m2, d_m3);
-printf("kernel call complete\n");fflush(stdin);
+
     //transferring result from device to host
     cudaMemcpy(h_m3, d_m3, MAX_BYTES, cudaMemcpyDeviceToHost);
 

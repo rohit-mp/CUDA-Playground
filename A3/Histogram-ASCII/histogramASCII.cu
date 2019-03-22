@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 	unsigned int *hostBins;
 	unsigned int *deviceInput;
 	unsigned int *deviceBins;
-	int *length;//added
+	int *length;
 
 	args = wbArg_read(argc, argv);
 
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 	// Allocating GPU memory
 	cudaMalloc((void **)&deviceInput, inputLength * sizeof(uint));
 	cudaMalloc((void **)&deviceBins, NUM_BINS * sizeof(uint));
-	cudaMalloc((void **)&length, sizeof(int));//added
+	cudaMalloc((void **)&length, sizeof(int));
 	CUDA_CHECK(cudaDeviceSynchronize());
 	wbTime_stop(GPU, "Allocating GPU memory.");
 
@@ -66,12 +66,11 @@ int main(int argc, char *argv[]) {
 	// Copying memory to the GPU
 	cudaMemcpy(deviceInput, hostInput, inputLength * sizeof(uint), cudaMemcpyHostToDevice);
 	cudaMemcpy(deviceBins, hostBins, NUM_BINS * sizeof(uint), cudaMemcpyHostToDevice);
-	cudaMemcpy(length, &inputLength, sizeof(int), cudaMemcpyHostToDevice);//added
+	cudaMemcpy(length, &inputLength, sizeof(int), cudaMemcpyHostToDevice);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	wbTime_stop(GPU, "Copying input memory to the GPU.");
 
 	// Launch kernel
-	// ----------------------------------------------------------
 	compute<<< CEIL(inputLength, 1024), 1024 >>>(deviceInput, deviceBins, length);
 	wbLog(TRACE, "Launching kernel");
 	wbTime_start(Compute, "Performing CUDA computation");
@@ -92,7 +91,6 @@ int main(int argc, char *argv[]) {
 	wbTime_stop(GPU, "Freeing GPU Memory");
 
 	// Verify correctness
-	// -----------------------------------------------------
 	wbSolution(args, hostBins, NUM_BINS);
 
 	free(hostBins);

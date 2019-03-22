@@ -4,7 +4,7 @@ const int ARRAY_SIZE =500000; // size greater than 32M could not be achieved
 const int ARRAY_BYTES = ARRAY_SIZE * sizeof(float);
 const int MAX_NO_THREADS = 512;
 
-__global__ void array_add(float *d_in1, float *d_in2, float *d_out){
+__global__ void vector_reduce(float *d_in1, float *d_in2, float *d_out){
     int index = threadIdx.x + blockIdx.x*blockDim.x ;
     *(d_out+index) = *(d_in1+index) + *(d_in2+index);
 }
@@ -46,7 +46,7 @@ int main(){
     cudaMemcpy(d_in2, h_in2, ARRAY_BYTES, cudaMemcpyHostToDevice);
 
     //starting kernel
-    array_add<<<(int)(ARRAY_SIZE/MAX_NO_THREADS)+1, MAX_NO_THREADS>>>(d_in1, d_in2, d_out);
+    vector_reduce<<<(int)(ARRAY_SIZE/MAX_NO_THREADS)+1, MAX_NO_THREADS>>>(d_in1, d_in2, d_out);
 
     //transferring memory from device to host
     cudaMemcpy(h_out, d_out, ARRAY_BYTES, cudaMemcpyDeviceToHost);

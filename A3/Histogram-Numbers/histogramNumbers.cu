@@ -33,8 +33,7 @@ int main(int argc, char *argv[]) {
 	uint *hostBins;
 	uint *deviceInput;
 	uint *deviceBins;
-
-	/* Read input arguments here */
+/
 	wbArg_t args = wbArg_read(argc, argv);
 
 	wbTime_start(Generic, "Importing data and creating memory on host");
@@ -80,7 +79,6 @@ int main(int argc, char *argv[]) {
 	wbTime_stop(GPU, "Freeing GPU Memory");
 
 	// Verify correctness
-	// -----------------------------------------------------
 	wbSolution(args, hostBins, NUM_BINS);
 
 	free(hostBins);

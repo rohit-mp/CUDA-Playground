@@ -28,7 +28,6 @@ int main(int argc, char *argv[]) {
 	float *hostOutput = NULL;
 	int inputLength;
 
-	/* parse the input arguments */
 	wbArg_t arguments = wbArg_read(argc, argv);
 	char *output = wbArg_getInputFile(arguments, 0);
 	char *input1 = wbArg_getInputFile(arguments, 1);
@@ -55,18 +54,14 @@ int main(int argc, char *argv[]) {
 	hostOutput = new float[inputLength];
 
 	// Declare and allocate thrust device input and output vectors and copy to device
-	//@@ Insert Code here
 	thrust::host_vector<float> h_in1(hostInput1, hostInput1+inputLength);
 	thrust::host_vector<float> h_in2(hostInput2, hostInput2+inputLength);
 	thrust::device_vector<float> d_in1=h_in1, d_in2=h_in2, d_out(inputLength);
 
 	// Execute vector addition
-	//@@ Insert Code here
     thrust::transform(d_in1.begin(), d_in1.end(), d_in2.begin(), d_out.begin(), thrust::plus<float>());
-	/////////////////////////////////////////////////////////
 
 	// Copy data back to host
-	//@@ Insert Code here
 	thrust::host_vector<float> h_out = d_out;
 	thrust::copy(h_out.begin(), h_out.end(), hostOutput);
 	

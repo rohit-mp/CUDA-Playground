@@ -20,7 +20,8 @@ using namespace std;
 
 const int num_channels = 3;
 
-__global__ void convolve(float *deviceInputImageData, float* __restrict__ deviceMaskData, float *deviceOutputImageData, int width, int height){
+__global__ void convolve(float *deviceInputImageData, float* __restrict__ deviceMaskData, float *deviceOutputImageData,
+	 int width, int height){
 
 	int idx = blockDim.x*blockIdx.x + threadIdx.x;
 	if(idx>=0 && idx<width*height){
@@ -29,8 +30,8 @@ __global__ void convolve(float *deviceInputImageData, float* __restrict__ device
 			for(int c=-Mask_radius; c<=Mask_radius; c++){
 				for(int channel=0; channel<num_channels; channel++){
 					if( c>=-(idx%width) && r>=-(idx/width) && c<width-idx%width && r<height-idx/width)
-					//idx + r*num_channels*width[0] + c*num_channels >= 0 && idx + r*num_channels*width[0] + c*num_channels < height[0]*width[0]*num_channels)
-						color[channel]+= deviceInputImageData[idx*num_channels + r*num_channels*width + c*num_channels + channel] * deviceMaskData[(r+Mask_radius)*Mask_width + c+Mask_radius];
+						color[channel]+= deviceInputImageData[idx*num_channels + r*num_channels*width +
+						 c*num_channels + channel] * deviceMaskData[(r+Mask_radius)*Mask_width + c+Mask_radius];
 				}
 			}
 		}
@@ -60,8 +61,7 @@ int main(int argc, char *argv[]) {
 	float *deviceOutputImageData;
 	float *deviceMaskData;
 
-	arg = wbArg_read(argc, argv); /* parse the input arguments */
-
+	arg = wbArg_read(argc, argv);
 	inputImageFile = wbArg_getInputFile(arg, 0);
 	inputMaskFile  = wbArg_getInputFile(arg, 1);
 
@@ -113,7 +113,6 @@ int main(int argc, char *argv[]) {
 
 	wbSolution(arg, outputImage);
 
-	//@@ Insert code here
 	free(hostInputImageData);
 	free(hostOutputImageData);
 	free(hostMaskData);
